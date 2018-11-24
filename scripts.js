@@ -1,86 +1,102 @@
-var PropType = {
-	STRING: function() {
-		var changeHandler = $.noop;
-		return {
-			getValue: function() {
-				//
-			},
-			setValue: function(value) {
-				//
-			},
-			render: function() {
-				return $(`<input type="text">`);
-			},
-			change: (callback) => changeHandler = callback,
-		};
-	},
-	BOOL: function() {
-		var changeHandler = $.noop;
-		return {
-			getValue: function() {
-				//
-			},
-			setValue: function(value) {
-				//
-			},
-			render: function() {
-				return $(`<input type="checkbox">`);
-			},
-			change: (callback) => changeHandler = callback,
-		};
-	},
-	INT: function() {
-		var changeHandler = $.noop;
-		return {
-			getValue: function() {
-				//
-			},
-			setValue: function(value) {
-				//
-			},
-			render: function() {
-				return $(`<input type="number">`);
-			},
-			change: (callback) => changeHandler = callback,
-		};
-	},
-	COLOR: function() {
-		var changeHandler = $.noop;
-		return {
-			getValue: function() {
-				//
-			},
-			setValue: function(value) {
-				//
-			},
-			render: function() {
-				return $(`<input type="color">`);
-			},
-			change: (callback) => changeHandler = callback,
-		};
-	},
-	SELECT: function(options) {
-		options = _.concat([""], options);
+class Prop {
+	constructor(initial) {
+		this.$input = null;
+		this.required = false;
+		this.changeHandler = $.noop;
 
-		// var value = "";
-		var changeHandler = $.noop;
-		var $input = $("<select/>")
+		this.$input = $(`<input type="text">`)
+			.val(initial || '')
+			.change(e => this.changeHandler());
+	}
+	get value() {
+		return this.$input.val();
+	}
+	set value(value) {
+		this.$input.val(value).change();
+		return this;
+	}
+	render() {
+		return this.$input;
+	}
+	required() {
+		this.required = true;
+		return this;
+	}
+	changed(callback) {
+		this.changeHandler = callback;
+		return this;
+	}
+}
+
+class StringProp extends Prop {
+	constructor(initial) {
+		super(initial);
+	}
+}
+
+class BoolProp extends Prop {
+	constructor(initial) {
+		super(initial);
+
+		this.$input = $(`<input type="checkbox">`)
+			.val(initial)
+			.change(this.changeHandler);
+	}
+}
+
+class IntProp extends Prop {
+	constructor(initial) {
+		super(initial);
+
+		this.$input = $(`<input type="number">`)
+			.val(initial)
+			.change(this.changeHandler);
+	}
+}
+
+class ColorProp extends Prop {
+	constructor(initial) {
+		super(initial);
+
+		this.$input = $(`<input type="color">`)
+			.val(initial)
+			.change(this.changeHandler);
+	}
+}
+
+class SelectProp extends Prop {
+	constructor(initial, options) {
+		//options = _.concat([""], options);
+
+		super();
+
+		this.$input = $("<select/>")
 			.append(
 				_.map(options, option => $("<option/>").text(option).val(option))
 			)
-			// .change(e => value = $("option:selected", this).val())	// FAIL: ES6 arrow function scopes 'this' with closure
-			// .change(({currentTarget}) => value = $(currentTarget).find("option:selected").val())
-			// .change(({currentTarget}) => value = $("option:selected", currentTarget).val())
-			// .change(changeHandler) // FAIL
-			.change(e => changeHandler())
+			.val(initial || '')
+			.change(e => this.changeHandler())
 		;
+	}
+	get value() {
+		return $("option:selected", this.$input).val();
+	}
+}
 
-		return {
-			// getValue: () => { return value },
-			getValue: () => { return $("option:selected", $input).val() },
-			setValue: (value) => { $input.val(value).change() },
-			render: () => { return $input },
-			change: (callback) => { changeHandler = callback },
-		};
+var PropType = {
+	STRING: function(initial) {
+		return new StringProp(initial);
+	},
+	BOOL: function(initial) {
+		return new BoolProp(initial);
+	},
+	INT: function(initial) {
+		return new IntProp(initial);
+	},
+	COLOR: function(initial) {
+		return new ColorProp(initial);
+	},
+	SELECT: function(initial, options) {
+		return new SelectProp(initial, options);
 	},
 };
