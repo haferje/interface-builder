@@ -28,75 +28,55 @@ class Prop {
 	}
 }
 
-class StringProp extends Prop {
-	constructor(initial) {
-		super(initial);
-	}
-}
-
-class BoolProp extends Prop {
-	constructor(initial) {
-		super(initial);
-
-		this.$input = $(`<input type="checkbox">`)
-			.val(initial)
-			.change(this.changeHandler);
-	}
-}
-
-class IntProp extends Prop {
-	constructor(initial) {
-		super(initial);
-
-		this.$input = $(`<input type="number">`)
-			.val(initial)
-			.change(this.changeHandler);
-	}
-}
-
-class ColorProp extends Prop {
-	constructor(initial) {
-		super(initial);
-
-		this.$input = $(`<input type="color">`)
-			.val(initial)
-			.change(this.changeHandler);
-	}
-}
-
-class SelectProp extends Prop {
-	constructor(initial, options) {
-		//options = _.concat([""], options);
-
-		super();
-
-		this.$input = $("<select/>")
-			.append(
-				_.map(options, option => $("<option/>").text(option).val(option))
-			)
-			.val(initial || '')
-			.change(e => this.changeHandler())
-		;
-	}
-	get value() {
-		return $("option:selected", this.$input).val();
-	}
-}
-
 var PropType = {
-	STRING: function(initial) {
-		return new StringProp(initial);
+	String: class extends Prop {
+		constructor(initial) {
+			super(initial);
+		}
 	},
-	BOOL: function(initial) {
-		return new BoolProp(initial);
+	Bool: class extends Prop {
+		constructor(initial) {
+			super(initial);
+
+			this.$input = $(`<input type="checkbox">`)
+				.val(initial)
+				.change(this.changeHandler);
+		}
 	},
-	INT: function(initial) {
-		return new IntProp(initial);
+	Int: class extends Prop {
+		constructor(initial) {
+			super(initial);
+
+			this.$input = $(`<input type="number">`)
+				.val(initial)
+				.change(this.changeHandler);
+		}
 	},
-	COLOR: function(initial) {
-		return new ColorProp(initial);
+	Color: class extends Prop {
+		constructor(initial) {
+			super(initial);
+
+			this.$input = $(`<input type="color">`)
+				.val(initial)
+				.change(this.changeHandler);
+		}
 	},
-	SELECT: function(initial, options) {
-		return new SelectProp(initial, options);
+	Select: class extends Prop {
+		constructor(initial, options) {
+			//options = _.concat([""], options);
+
+			super();
+
+			this.$input = $("<select/>")
+				.append(
+					_.map(options, option => $("<option/>").text(option).val(option))
+				)
+				.val(initial || '')
+				.change(e => this.changeHandler())
+			;
+		}
+		get value() {
+			return $("option:selected", this.$input).val();
+		}
 	},
 };
