@@ -1,0 +1,358 @@
+{
+	"$jason": {
+		"head": {
+			"title": "...", // required title for app
+			"description": "...",
+			"icon": "...",
+			"offline": "true/yes/on", // default true (any value is true)
+			// commonly used style classes for reuse
+			"styles": {
+				// global style names
+				"styled_row": {
+					"font": "HelveticaNeue",
+					"size": "20",
+					"color": "#ff0000",
+					"padding": "10"
+				}
+			},
+			// defined under action registry and reused with 'trigger' keyword
+			"actions": {
+			},
+			// to dynamically render data
+			"templates": {
+			},
+			// inline database automatically rendered by body template
+			"data": {
+			},
+			// utilize JavaScript technologies (like frontend microservices)
+			"agents": {
+			}
+		},
+		"body": {
+			"header": {
+				// basic
+				"title": "",
+				// advanced
+				"title": {
+					"type": "label/image",
+					"text": "",
+					"url": "",
+					"style": {
+						"align": "left/center", // default center
+						"width": "94",
+						"height": "27",
+						"top": "94",
+						"left": "94", // only applicable when align left
+						"font": "94", // when type label
+						"size": "94" // when type label
+					},
+					"url": "https://raw.githubusercontent.com/Jasonette/Instagram-UI-example/master/images/logo.png"
+				},
+				// calls an action when user submits a query
+				"search": {
+					"name": "query_text", // local variable name to store search input
+					"placeholder": "Search something",
+					"style": {
+						"background": "#000000",
+						"color": "#000000" // tint color for placeholder, text, and icon
+					},
+					"action": {
+						"type": "$util.alert", // action to call
+						"options": {
+							"title": "You've entered:",
+							"description": "{{$get.query_text}}" // utilizing local variable
+						}
+					}
+				},
+				// menu button at top right corner of header
+				// can call actions or link to another view
+				"menu": {
+					// text or image, but not both
+					"text": "Tap me",
+					"image": "", // icon URL
+					"style": {
+						"color": "#0000ff", // font color or image mask color
+						"font": "HelveticaNeue-Bold",
+						"size": "17"
+					},
+					// href or action, but not both
+					"href": "", // view to transition to when touched
+					// action to trigger when touched
+					"action": {
+						"type": "$util.toast",
+						"options": {
+							"text": "Good job!"
+						}
+					},
+					"badge": {
+						"text": "3",
+						"style": {
+							"background": "#ff0000",
+							"color": "#ffffff",
+							"top": "34",
+							"left": "23"
+						}
+					}
+				},
+				"style": {
+					"font": "",
+					"size": "",
+					"background": "",
+					"color": ""
+				}
+			},
+			// scrollable list of items (can mix and match)
+			"sections": [{
+				"type": "horizontal/", // horizontal or default vertical
+				// display only, functions as divider between sections
+				// sticks to top until section is scrolled away
+				"header": {
+					"type": "vertical/horizontal/label/image/button", // vert/horiz for layout, or component name (label/image/button/etc.)
+					// if its a layout item
+					"components": [{
+					}],
+					// layout style + item specific style
+					"style": {
+						"color": "#ff0000", // item disclosure indicator in case href used
+						"height": "",
+						"z_index": "" // integer, negative or positive (defaults to higher value than that of items)
+					}
+				},
+				// Components or Layouts
+				// component = single, basic UI unit
+				// layout = composition of multiple components
+				"items": [{
+					"type": "vertical/horizontal/label/image/button", // vert/horiz for layout, or component name (label/image/button/etc.)
+					// only when type is vert/horiz
+					"components": [{
+						"type": "image/label",
+						"url": ""
+					}],
+					"text": "This is row 1",
+					// inline styles
+					// layout style + item specific style
+					"style": {
+						"font": "HelveticaNeue",
+						"size": "20",
+						"color": "#ff0000", // item disclosure indicator in case href is used
+						"padding": "10",
+						"height": "",
+						"z_index": "" // integer, negative or positive
+					},
+					"class": "", // global style name (multiple, space-separated)
+					"action": "", // action to call when tapped
+					"href": "" // view to load when tapped
+				}]
+			}],
+			// floating, non-scrolling items
+			"layers": [{
+				"type": "label",
+				"text": "",
+				"action": "", // action to run on tap
+				"style": {
+					"width": "",
+					"height": "",
+					"padding": "",
+					"top": "",
+					"left": "50%-25", // calc
+					"right": "",
+					"bottom": "",
+					"corner_radius": "",
+					"font": "",
+					"size": "",
+					"background": "",
+					"color": "",
+					"align": "left/center/right", // default left
+					"resize": "true", // default false
+					"move": "true", // drag, default false
+					"rotate": "true" // default false
+				}
+			},{
+				"type": "image",
+				"url": "",
+				"action": "",
+				"style": {
+					"width": "",
+					"height": "",
+					"top": "",
+					"left": "",
+					"right": "",
+					"bottom": "",
+					"corner_radius": "",
+					"color": "", // tint color for icons
+					"resize": "true", // default false
+					"move": "true", // default false
+					"rotate": "true" // default false
+				}
+			}],
+			"footer": {
+				// chat input element
+				"input": {
+					"style": {
+						"background": "#cecece" // background color for root toolbar containing all of below
+					},
+					// left button (image only)
+					"left": {
+						"image": "https://www.jasonclient.org/img/camera.png",
+						"style": {
+							"color": "#ff0000" // tint color for image
+						},
+						"action": {
+							"type": "$media.camera"
+						}
+					},
+					"textfield": {
+						"name": "message", // local variable connected to input field
+						"placeholder": "Say something...", // placeholder text for input
+						"style": {
+							"background": "#ffffff",
+							"color": "#ff0000",
+							"color:placeholder": "#ebebeb" // placeholder color
+						}
+					},
+					// right button
+					"right": {
+						"text": "Send",
+						"style": {
+							"color": "#ff0000",
+							"color:disabled": "#ebebeb" // disabled state font color
+						},
+						"action": {
+							"type": "$network.request",
+							"options": {
+								"url": "https://jasonchat.org/post.json",
+								"method": "post",
+								"data": {
+									"message": "{{$get.message}}"
+								}
+							},
+							"success": {
+								"type": "$reload"
+							}
+						}
+					}
+				},
+				// tab element
+				// ONLY USE at root level (first view on launch, else introduces unexpected behavior)
+				// first tab MUST have a URL that EXACTLY matches URL of view it loads from
+				// MAXIMUM of 5 tabs
+				// MINIMUM of 2 items
+				"tabs": {
+					// overall style for the tab bar
+					"style": {
+						"background": "rgba(255,255,255,0.8)", // bg color for entire tab bar
+						"color:disabled": "#cecece", // deselected item color
+						"color": "#009efa" // selected item color
+					},
+					// tab bar items
+					"items": [{
+						"text": "Home",
+						"image": "https://raw.githubusercontent.com/Jasonette/Twitter-UI-example/master/images/home.png", // icon
+						"style": {
+							"width": "21",
+							"height": "21"
+						},
+						"badge": "Home",
+						"url": "https://raw.githubusercontent.com/Jasonette/Twitter-UI-example/master/home.json", // view URL to load when tapped
+						"href": "Home", // view href to load when tapped
+						"action": {} // action to run when tapped
+					}]
+				}
+			},
+			// currently iOS only - need to be enabled in Xcode
+			"ads": [
+				{
+					"type": "admob",
+					"options": {
+						"type": "banner/interstitial",
+						"unitId": "a14dccd0fb24d45/ca-app-pub-6606303247985815/7014816684" // AdMob Unit ID
+					}
+				}
+			],
+			// background for entire view
+			// used to be body.style.background
+			// color "rgb(144,233,233)/rgba(255,255,255,0.3)/#ff0000"
+			// image URL
+			// "camera" for basic camera
+			"background": "",
+			// JSON web container for embedded self-contained web view
+			"background": {
+				"type": "html",
+				"text": "<html><head><style>...</style><script>....</script></head><body>...</body></html>",
+				"action": {
+					"type": "$default"
+				}
+			},
+			// { "type": "camera" } for advanced background
+			"background": {
+				"type": "camera",
+				"options": {
+					"device": "back"
+				}
+			},
+			"style": {
+				"border": "#000000/none" // border color for section items
+			}
+		}
+	}
+}
+
+
+
+
+// Link
+  "href": {
+    "url": "https://www.jasonclient.org/next.json",
+    "view": "jason/web/app", // jasonette view (json), HTML to load into internal browser, open external apps (using url scheme ex: sms:/mailto:/twitter://) - default jason
+    // parameters to pass to next view, accessed using $params
+    "options": {
+    },
+    "transition": "push/modal/replace",
+    "loading": "true", // DEPRECATED - show loading indicator when new view loads
+    // entire view representation of a view without head
+    "preload": {
+      "style": {
+        "background": "#ff0000"
+      },
+      "layers": [{
+        "type": "image",
+        "url": "file://loading.gif",
+        "style": {
+          "top": "50%-25",
+          "left": "50%-25",
+          "width": "50",
+          "height": "50"
+        }
+      }]
+    }
+  }
+
+// Actions
+// Components
+// Layout
+// Templates
+// Mix-in
+// Offline
+// Agents
+// Web Container
+
+// Environment Variables
+// read-only
+$env.device.width
+$env.device.height
+$env.device.os.name
+$env.device.os.version
+$env.device.language // device language ("en-US", etc.)
+$env.view.url // current view url
+
+// Tips
+// colors
+"rgb(244,244,244)" // rgb
+"rgba(255,255,255,0.3)" // rgba
+"#ff0000" // hex
+// dimensions
+300 // pixels
+100% // percent
+100%-300 // combination
+
+// Extending
