@@ -1,61 +1,71 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>TITLE</title>
+		<title>Interface Builder</title>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/html5sortable/0.9.8/html5sortable.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.8.1/Sortable.min.js"></script>
 		<script src="scripts.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.0/css/bootstrap.min.css"/>
 	</head>
 	<body>
 
-		<div id="root">
+		<div class="row">
+			<div class="col-md-2">
 
-			<div id="layout"></div>
+				<div id="toolbox" class="list-group node">
+					<div class="list-group-item">a</div>
+					<div class="list-group-item">b</div>
+					<div class="list-group-item">c</div>
+				</div>
 
-			<table id="properties">
-				<thead>
-					<tr>
-						<th>Prop</th>
-						<th>Value</th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
+			</div>
+			<div class="col-md-7">
 
+				<div id="nodes" class="list-group node">
+					<div class="node-name">$json</div>
+					<div class="list-group-item">a</div>
+					<div class="list-group-item">b</div>
+					<div class="list-group-item">c</div>
+				</div>
+
+			</div>
+			<div class="col-md-3">
+
+				<table id="properties" class="table table-bordered">
+					<thead>
+						<tr>
+							<th>Property</th>
+							<th>Value</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+					<tfoot></tfoot>
+				</div>
+
+			</div>
 		</div>
 
 		<style>
-			.item {
+			.node {
 				position: relative;
-				border: 1px solid lightblue;
+				border: 1px solid lightgrey;
 				padding: 20px;
 				border-radius: 4px;
 				margin: 2px;
 			}
-			.item-name {
+			.node-ghost {
+				background-color: lightblue;
+			}
+			.node-name {
 				display: inline;
 				position: absolute;
 				top: 0;
 				left: 0;
-				background-color: lightblue;
+				background-color: black;
+				color: white;
+				padding: 0px 4px;
 			}
-			.sortable {
-				background-color: yellow;
-				height: 20px;
-			}
-			.sortable-placeholder {
-				border: 1px solid darkgreen;
-				background-color: lightgreen;
-			}
-			.sortable-hover {
-				background-color: green;
-			}
-			.list {}
-			.list-item {}
-			.sublist {}
-			.sublist-item {}
 		</style>
 
 		<script>
@@ -72,14 +82,36 @@
 			};
 
 
+			var toolbox, nodes;
 			$(function() {
 
 				// render layout
 
-				var $layout = $("#layout");
-				$layout.append(new JasonItem().render());
-				// $layout.append(new BodyHeadItem().render())
-				$layout.append(new Dropzone().render())
+				// var $layout = $("#root");
+				// $layout.append(new JasonItem().render());
+				// // $layout.append(new BodyHeadItem().render())
+				// $layout.append(new Dropzone().render())
+
+				toolbox = new Sortable($('#toolbox').get(0), {
+					group: {
+						name: 'shared',
+						pull: 'clone',
+						put: false,
+					},
+					animation: 150,
+					sort: false,
+					onClone: function (/**Event*/evt) {
+						var origEl = evt.item;
+						var cloneEl = evt.clone;
+						console.log(['clone', origEl, cloneEl, evt]);
+					},
+				});
+
+				nodes = new Sortable($('#nodes').get(0), {
+					group: 'shared',
+					animation: 150,
+					ghostClass: 'node-ghost',
+				});
 
 				// render properties
 
@@ -105,17 +137,6 @@
 				// properties JSON
 
 				console.log(_.map(props, (prop, name) => ({ [name]: prop.value })));
-
-				_.each(sorters, sorter => {
-					var s = sortable(`.sortable.${sorter.class}`, sorter.options);
-					if (!s.length)
-						return;
-					console.log(s);
-					// $(s).on('sortupdate', e => {
-					s[0].addEventListener('sortupdate', e => {
-						console.log(e.detail.destination.items);
-					});
-				});
 
 			});
 		</script>

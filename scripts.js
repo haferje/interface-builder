@@ -51,6 +51,7 @@ var PropType = {
 				.val(initial)
 				.change(e => this.changeHandler())
 		}
+
 		get value() {
 			return ''+this.$input.val();
 		}
@@ -78,182 +79,71 @@ var PropType = {
 				.change(e => this.changeHandler())
 			;
 		}
+
 		get value() {
 			return $("option:selected", this.$input).val();
 		}
 	},
+	// Node: class extends PropTypeBase {
+	// 	constructor() {
+
+	// 	}
+	// },
+	// Nodes: class extends PropTypeBase {
+	// 	constructor() {
+
+	// 	}
+	// },
 };
 
-var sorters = [];
-class Dropzone {
-	constructor(config) {
-		this.max = 0; // unlimited
-		this.accepts = ".sortable";
-		this.items = [];
-		this.uuid = (function uuidv4() {
-			// return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-			return 'x'+([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-				(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-			);
-		})();
 
-		_.extend(this, config);
-
-		sorters.push({
-			class: this.uuid,
-			options: {
-				placeholderClass: '.sortable-placeholder',
-				hoverClass: 'sortable-hover',
-				items: ':not(.disabled)',
-				acceptFrom: this.accepts,
-				copy: true,
-				maxItems: 0 || this.max,
-			}
-		});
-	}
-
-	render() {
-		var $out = $(`
-			<div class="sortable ${this.uuid}">
-				<div class="sortable"></div>
-			</div>
-		`);
-		// sortable('.sortable', {
-		// 	placeholderClass: '.sortable-placeholder',
-		// 	hoverClass: 'sortable-hover',
-		// 	items: ':not(.disabled)',
-		// 	acceptFrom: this.accepts,
-		// 	copy: true,
-		// 	maxItems: 0 || this.max,
-		// 	//
-		// 	// connectWith: '',
-		// 	// handle: '',
-		// 	// forcePlaceholderSize: true,
-		// 	// placeholder: '',
-		// 	// itemSerializer: $.noop,
-		// 	// containerSerializer
-		// 	// customDragImage
-
-		// });
-		// $out.on('sortupdate', e => {
-		// 	console.log(e.detail.destination.items);
-		// });
-		// // sortstart
-		// // sortstop
-		// // sortupdate
-		// // //
-		// // destroy
-		// // disable
-		// // enable
-		// // serialize
-		// // reload
-		return $out;
-	}
-
-	source() {
-		//
-	}
-}
-
-class ItemBase {
-	constructor() {
-		this.children = [];
-		this.name = "Item";
-	}
-
-	render() {
-		return $(`
-			<div class="item">
-				<div class="item-name">${this.name}</div>
-			</div>
-		`);
-	}
-
-	source() {
-		return {};
-	}
-}
-
-class JasonItem extends ItemBase {
-	constructor() {
-		super();
-
-		this.name = "$jason";
-		this.head = new HeadItem();
-		this.body = new BodyItem();
-	}
-
-	render() {
-		// return $(`
-		// 	<div class="item">
-		// 		<div class="item-name">${this.name}</div>
-		// 		${this.head.render()}
-		// 		${this.body.render()}
-		// 	</div>
-		// `);
-		return (
-			$("<div/>", { class: "item" })
-				.append(
-					$("<div/>", { class: "item-name" })
-						.text(this.name)
-				)
-				.append(this.head.render())
-				.append(this.body.render())
+var Util = {
+	uuid: function() {
+		// return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+		return 'x'+([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
 		);
-	}
+	},
+};
 
-	source() {
-		return {
-			head: this.head.source(),
-			body: this.body.source(),
-		};
-	}
-}
 
-class HeadItem extends ItemBase {
-	constructor() {
-		super();
 
-		this.name = "head";
+
+class Node {
+	constructor(name, struct) {
+		this.name = name;
+		this.props = struct.props || [];
+		this.nodes = struct.nodes || [];
 	}
 }
 
-class BodyItem extends ItemBase {
-	constructor() {
-		super();
+var NodeTypes = {
 
-		this.name = "body";
-		this.header = new Dropzone({ accepts: ".sortable", max: 1 });
-		this.sections = new Dropzone({ accepts: "" });
-		this.layers = new Dropzone({ accepts: "" });
-		this.footer = new Dropzone({ accepts: "", max: 1 });
-	}
+};
 
-	render() {
-		var $out = $(`
-			<div class="item">
-				<div class="item-name">${this.name}</div>
-			</div>
-		`);
+var $json = new Node('$json', {
+	props: [],
+	nodes: [
+		{ head: null }, // max 1
+		{ body: null }, // max 1
+	],
+});
 
-		$out.append(this.header.render());
-		$out.append(this.sections.render());
-		$out.append(this.layers.render());
-		$out.append(this.footer.render());
+var body = new Node('body', {
+	props: [],
+	nodes: [
+		{ header: null }, // max 1
+		{ sections: null },
+		{ layers: null },
+		{ footer: null }, // max 1
+	],
+});
 
-		return $out;
-	}
 
-	source() {
-		// TODO
-		return {};
-	}
-}
 
-class BodyHeadItem extends ItemBase {
-	constructor() {
-		super();
 
-		// this.name = "bodyhead";
-	}
-}
+
+
+
+
+
