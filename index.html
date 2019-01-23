@@ -92,6 +92,20 @@
 				// // $layout.append(new BodyHeadItem().render())
 				// $layout.append(new Dropzone().render())
 
+
+
+				$('#toolbox').empty();
+				// _.each(NodeTypes, nodeType => $('#toolbox').append('<li class="list-group-item">'+nodeType.name()+'</li>').data('nodeType', nodeType));
+				_.each(NodeTypes, nodeType => {
+					var node = $('<li>')
+						.addClass('list-group-item')
+						.text(nodeType.name)
+						.data('nodeType', nodeType);
+					$('#toolbox').append(node);
+				});
+
+
+
 				toolbox = new Sortable($('#toolbox').get(0), {
 					group: {
 						name: 'shared',
@@ -107,11 +121,25 @@
 					},
 				});
 
-				nodes = new Sortable($('#nodes').get(0), {
+
+				var options = {
 					group: 'shared',
 					animation: 150,
 					ghostClass: 'node-ghost',
-				});
+
+					// Element is dropped into the list from another list
+					onAdd: function (/**Event*/evt) {
+						// same properties as onEnd
+						console.log('onAdd', evt);
+						console.log($(evt.item).data());
+						// $(evt.item).replaceWith( $('<div class="list-group-item">NEW DISPLAY</div>') );
+						var newGroup = $('<div class="list-group-item"><div class="list-group"><div class="list-group-item">NEW DISPLAY 1</div><div class="list-group-item">NEW DISPLAY 2</div></div></div>');
+						$(evt.item).replaceWith(newGroup);
+						Sortable.create($('.list-group', newGroup).get(0), options);
+					},
+				};
+
+				nodes = new Sortable($('#nodes').get(0), options);
 
 				// render properties
 

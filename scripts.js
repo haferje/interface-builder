@@ -110,40 +110,88 @@ var Util = {
 
 
 class Node {
+	static name() { 'un-named'; }
+
 	constructor(name, struct) {
-		this.name = name;
 		this.props = struct.props || [];
 		this.nodes = struct.nodes || [];
 	}
+
+	render() {
+		//
+	}
+
+	toJson() {
+		//
+	}
 }
 
-var NodeTypes = {
+class NodeList {
+	constructor(types, max) {
+		this.types = _.concat(types); // takes single element or array
+		this.max = max || 0; // unlimited
+		this.list = [];
+	}
+}
 
+class JsonNode extends Node {
+	static name() { return '$json'; }
+	constructor() {
+		super({
+			props: {},
+			nodes: {
+				head: new NodeList(HeadNode, 1),
+				body: new NodeList(BodyNode, 1),
+			},
+		});
+	}
+}
+// JsonNode.name = '$json';
+
+class HeadNode extends Node {
+	static name() { return 'head'; }
+	constructor() {
+		super({
+			props: {},
+			nodes: {
+				//
+			},
+		});
+	}
+}
+// HeadNode.name = 'head';
+
+class BodyNode extends Node {
+	static name() { return 'body'; }
+	constructor() {
+		super({
+			props: {},
+			nodes: {
+				header: new NodeList(null, 1),
+				sections: new NodeList(null),
+				layers: new NodeList(null),
+				footer: new NodeList(null, 1),
+			},
+		});
+	}
+}
+// BodyNode.name = 'body';
+
+var NodeTypes = {
+	$json: JsonNode,
+	head: HeadNode,
+	body: BodyNode,
 };
 
-var $json = new Node('$json', {
-	props: [],
-	nodes: [
-		{ head: null }, // max 1
-		{ body: null }, // max 1
-	],
-});
 
-var body = new Node('body', {
-	props: [],
-	nodes: [
-		{ header: null }, // max 1
-		{ sections: null },
-		{ layers: null },
-		{ footer: null }, // max 1
-	],
-});
+/*
 
+// Element dragging ended
+onEnd
+// Element is dropped into the list from another list
+onAdd
+// Event when you move an item in the list or between lists
+onMove
 
-
-
-
-
-
-
+*/
 
