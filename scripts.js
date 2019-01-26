@@ -112,13 +112,34 @@ var Util = {
 class Node {
 	static name() { 'un-named'; }
 
-	constructor(name, struct) {
+	constructor(struct) {
 		this.props = struct.props || [];
 		this.nodes = struct.nodes || [];
 	}
 
 	render() {
-		//
+		return `
+			<div class="node-name">${this.constructor.name()}</div>
+			<div>
+				<ul class="list-group node">
+					${_.map(this.nodes.map, (item, i) => `
+						<li class="list-group-item">
+							a
+						</li>
+	  				`).join('')}
+				</ul>
+			</div>
+		`;
+		// return `
+		// 	<div class="node-name">${this.constructor.name()}</div>
+		// 	<div class="node">
+		// 		${_.map(this.nodes.map, (item, i) => `
+		// 			<div class="child-name">${i}</div>
+		// 			<ul class="list-group node">
+		// 			</ul>
+		//   		`).join('')}
+		// 	</div>
+		// `;
 	}
 
 	toJson() {

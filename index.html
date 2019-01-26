@@ -13,21 +13,32 @@
 		<div class="row">
 			<div class="col-md-2">
 
-				<div id="toolbox" class="list-group node">
-					<div class="list-group-item">a</div>
-					<div class="list-group-item">b</div>
-					<div class="list-group-item">c</div>
-				</div>
+				<ul id="toolbox" class="list-group node">
+					<li class="list-group-item">a</li>
+					<li class="list-group-item">b</li>
+					<li class="list-group-item">c</li>
+				</ul>
 
 			</div>
 			<div class="col-md-7">
 
-				<div id="nodes" class="list-group node">
-					<div class="node-name">$json</div>
-					<div class="list-group-item">a</div>
-					<div class="list-group-item">b</div>
-					<div class="list-group-item">c</div>
-				</div>
+				<div class="node-name">$json</div>
+				<ul id="nodes" class="list-group node">
+					<li class="list-group-item">
+
+						<div class="child-name">head</div>
+						<ul class="list-group node">
+							<!-- <div style="display:block;top:0;bottom:0;left:0;right:0;position:absolute;border:1px solid green;min-height:40px;"></div> -->
+						</ul>
+
+						<div class="child-name">body</div>
+						<ul class="list-group node">
+						</ul>
+
+					</li>
+					<li class="list-group-item">b</li>
+					<li class="list-group-item">c</li>
+				</ul>
 
 			</div>
 			<div class="col-md-3">
@@ -47,24 +58,39 @@
 		</div>
 
 		<style>
+			/*.list-group {
+				min-height: 100px;
+			}*/
+			#nodes .list-group-item {
+				padding: 0px;
+			}
 			.node {
 				position: relative;
 				border: 1px solid lightgrey;
-				padding: 20px;
+				padding: 22px;
 				border-radius: 4px;
 				margin: 2px;
 			}
-			.node-ghost {
-				background-color: lightblue;
-			}
 			.node-name {
-				display: inline;
-				position: absolute;
-				top: 0;
-				left: 0;
+				margin: 2px;
+				float: right;
+				border-radius: 4px;
+				display: inline-box;
 				background-color: black;
 				color: white;
 				padding: 0px 4px;
+			}
+			.child-name {
+				margin: 2px;
+				float: left;
+				border-radius: 4px;
+				display: inline-box;
+				background-color: blue;
+				color: white;
+				padding: 0px 4px;
+			}
+			.sortable-ghost {
+				background-color: lightblue;
 			}
 		</style>
 
@@ -114,6 +140,8 @@
 					},
 					animation: 150,
 					sort: false,
+					// draggable: '.list-group-item',
+
 					onClone: function (/**Event*/evt) {
 						var origEl = evt.item;
 						var cloneEl = evt.clone;
@@ -125,21 +153,33 @@
 				var options = {
 					group: 'shared',
 					animation: 150,
-					ghostClass: 'node-ghost',
+					// fallbackOnBody: true,
+					// draggable: '.list-group-item',
 
 					// Element is dropped into the list from another list
 					onAdd: function (/**Event*/evt) {
 						// same properties as onEnd
 						console.log('onAdd', evt);
 						console.log($(evt.item).data());
+
+						var nodeType = $(evt.item).data().nodeType;
+						var newNode = new nodeType();
+						console.log(newNode.render());
+
 						// $(evt.item).replaceWith( $('<div class="list-group-item">NEW DISPLAY</div>') );
-						var newGroup = $('<div class="list-group-item"><div class="list-group"><div class="list-group-item">NEW DISPLAY 1</div><div class="list-group-item">NEW DISPLAY 2</div></div></div>');
+						// var newGroup = $('<div class="list-group-item"><div class="list-group"><div class="list-group-item">NEW DISPLAY 1</div><div class="list-group-item">NEW DISPLAY 2</div></div></div>');
+						var newGroup = $(newNode.render());
 						$(evt.item).replaceWith(newGroup);
-						Sortable.create($('.list-group', newGroup).get(0), options);
+						// Sortable.create($('.list-group', newGroup).get(0), options);
+						Sortable.create(newGroup.closest('.list-group').get(0), options);
 					},
 				};
 
-				nodes = new Sortable($('#nodes').get(0), options);
+				// nodes = new Sortable($('#nodes').get(0), options);
+				var nestedSortables = [].slice.call(document.querySelectorAll('.node'));
+				for (var i = 0; i < nestedSortables.length; i++) {
+					new Sortable(nestedSortables[i], options);
+				}
 
 				// render properties
 
