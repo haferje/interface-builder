@@ -119,27 +119,23 @@ class Node {
 
 	render() {
 		return `
-			<div class="node-name">${this.constructor.name()}</div>
-			<div>
-				<ul class="list-group node">
-					${_.map(this.nodes.map, (item, i) => `
-						<li class="list-group-item">
-							a
-						</li>
-	  				`).join('')}
+			<li class="list-group-item">
+
+				<div class="node-label"><div>${this.constructor.name()}</div></div>
+				<ul class="list-group">
+					<li class="list-group-item">
+
+				${_.map(this.nodes, (item, i) => `
+						<div class="child-label"><div>${i}</div></div>
+						<ul class="list-group">
+						</ul>
+				`).join('')}
+
+					</li>
 				</ul>
-			</div>
+
+			</li>
 		`;
-		// return `
-		// 	<div class="node-name">${this.constructor.name()}</div>
-		// 	<div class="node">
-		// 		${_.map(this.nodes.map, (item, i) => `
-		// 			<div class="child-name">${i}</div>
-		// 			<ul class="list-group node">
-		// 			</ul>
-		//   		`).join('')}
-		// 	</div>
-		// `;
 	}
 
 	toJson() {

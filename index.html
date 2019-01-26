@@ -13,7 +13,7 @@
 		<div class="row">
 			<div class="col-md-2">
 
-				<ul id="toolbox" class="list-group node">
+				<ul id="toolbox" class="list-group">
 					<li class="list-group-item">a</li>
 					<li class="list-group-item">b</li>
 					<li class="list-group-item">c</li>
@@ -22,23 +22,24 @@
 			</div>
 			<div class="col-md-7">
 
-				<div class="node-name">$json</div>
-				<ul id="nodes" class="list-group node">
-					<li class="list-group-item">
+				<div id="nodes">
 
-						<div class="child-name">head</div>
-						<ul class="list-group node">
-							<!-- <div style="display:block;top:0;bottom:0;left:0;right:0;position:absolute;border:1px solid green;min-height:40px;"></div> -->
-						</ul>
+					<div class="node-label"><div>$json</div></div>
+					<ul class="list-group">
+						<li class="list-group-item">
 
-						<div class="child-name">body</div>
-						<ul class="list-group node">
-						</ul>
+							<div class="child-label"><div>head</div></div>
+							<ul class="list-group">
+							</ul>
 
-					</li>
-					<li class="list-group-item">b</li>
-					<li class="list-group-item">c</li>
-				</ul>
+							<div class="child-label"><div>body</div></div>
+							<ul class="list-group">
+							</ul>
+
+						</li>
+					</ul>
+
+				</div>
 
 			</div>
 			<div class="col-md-3">
@@ -61,32 +62,40 @@
 			/*.list-group {
 				min-height: 100px;
 			}*/
+			#nodes .list-group {
+				/*position: relative;*/
+				border: 1px solid lightgrey;
+				/*padding: 22px;*/
+				padding-top: 22px;
+				border-radius: 4px;
+				/*margin: 22px 0px;*/
+				margin-bottom: 2px;
+				min-height: 46px;
+			}
 			#nodes .list-group-item {
 				padding: 0px;
+				margin: 0 22px;
 			}
-			.node {
-				position: relative;
-				border: 1px solid lightgrey;
-				padding: 22px;
-				border-radius: 4px;
-				margin: 2px;
-			}
-			.node-name {
-				margin: 2px;
-				float: right;
-				border-radius: 4px;
+			/*#nodes .node-label { overflow: auto; }*/
+			#nodes .node-label > div {
 				display: inline-box;
+				float: left;
+				/*position: relative;
+				top: 0;
+				right: 0;*/
 				background-color: black;
 				color: white;
+				border-radius: 4px;
 				padding: 0px 4px;
 			}
-			.child-name {
-				margin: 2px;
-				float: left;
-				border-radius: 4px;
+			/*#nodes .child-label { overflow: auto; }*/
+			#nodes .child-label > div {
 				display: inline-box;
+				float: right;
+				/*margin: 2px;*/
 				background-color: blue;
 				color: white;
+				border-radius: 4px;
 				padding: 0px 4px;
 			}
 			.sortable-ghost {
@@ -176,7 +185,7 @@
 				};
 
 				// nodes = new Sortable($('#nodes').get(0), options);
-				var nestedSortables = [].slice.call(document.querySelectorAll('.node'));
+				var nestedSortables = [].slice.call(document.querySelectorAll('#nodes .list-group'));
 				for (var i = 0; i < nestedSortables.length; i++) {
 					new Sortable(nestedSortables[i], options);
 				}
