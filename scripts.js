@@ -107,31 +107,60 @@ var Util = {
 };
 
 
+var Jsonette = {
+	$json: null,
+	initialize: function() {
+		Jsonette.$json = new JsonNode();
+		Jsonette.$json.nodes.head = new ChildList(HeadNode, 1);
+		Jsonette.$json.nodes.body = new ChildList(BodyNode, 1);
+		Jsonette.$json.nodes.head.add(new HeadNode());
+		Jsonette.$json.nodes.body.add(new BodyNode());
+	},
+	add: function(newNode, parentID, parentProp) {
+		var parentNode = Jsonette.$json.find(parentID);
+
+		if (!parentNode)
+			throw "Couldn't find parent.";
+
+		var childList = parentNode.nodes[parentProp];
+		childList.add(newNode);
+	},
+}
 
 
 class Node {
 	static name() { 'un-named'; }
 
 	constructor(struct) {
-		this.props = struct.props || [];
-		this.nodes = struct.nodes || [];
+		this.props = struct.props || {};
+		this.nodes = struct.nodes || {};
+		this.id = Util.uuid();
+		this.required = false;
+	}
+
+	find(nodeID) {
+		return (
+			_(this.nodes)
+			.map(childList => childList.find(nodeID))
+			.compact()
+			.first()
+		);
 	}
 
 	render() {
 		return `
-			<li class="list-group-item">
+			<li class="list-group-item" data-id="${this.id}">
 
 				<div class="node-label"><div>${this.constructor.name()}</div></div>
 				<ul class="list-group">
-					<li class="list-group-item">
-
 				${_.map(this.nodes, (item, i) => `
+					<li class="list-group-item">
 						<div class="child-label"><div>${i}</div></div>
-						<ul class="list-group">
+						<ul class="list-group ${item.required ? '' : 'sortable'}" data-id="${this.id}" data-property="${i}">
+							${item.render()}
 						</ul>
-				`).join('')}
-
 					</li>
+				`).join('')}
 				</ul>
 
 			</li>
@@ -143,11 +172,30 @@ class Node {
 	}
 }
 
-class NodeList {
+class ChildList {
 	constructor(types, max) {
-		this.types = _.concat(types); // takes single element or array
+		this.types = _.concat(types || []); // takes single element or array
 		this.max = max || 0; // unlimited
 		this.list = [];
+	}
+
+	add(node) {
+		if (this.max && this.max <= this.list.length)
+			throw "Max items allowed.";
+		// if (!_.contains(this.types, typeof node))
+		if (!_.find(this.types, nodeType => node instanceof nodeType))
+			throw "Item type not allowed.";
+
+		this.list.push(node);
+	}
+
+	find(nodeID) {
+		return _.find(this.list, node => node.id == nodeID);
+		// return _.find(this.list, node => node.id == nodeID);
+	}
+
+	render() {
+		return _.map(this.list, (item, i) => item.render()).join('');
 	}
 }
 
@@ -157,10 +205,11 @@ class JsonNode extends Node {
 		super({
 			props: {},
 			nodes: {
-				head: new NodeList(HeadNode, 1),
-				body: new NodeList(BodyNode, 1),
+				head: new ChildList(HeadNode, 1),
+				body: new ChildList(BodyNode, 1),
 			},
 		});
+		this.required = true;
 	}
 }
 // JsonNode.name = '$json';
@@ -171,9 +220,11 @@ class HeadNode extends Node {
 		super({
 			props: {},
 			nodes: {
-				//
+				// TEST
+				head: new ChildList(HeadNode, 1),
 			},
 		});
+		this.required = true;
 	}
 }
 // HeadNode.name = 'head';
@@ -184,12 +235,13 @@ class BodyNode extends Node {
 		super({
 			props: {},
 			nodes: {
-				header: new NodeList(null, 1),
-				sections: new NodeList(null),
-				layers: new NodeList(null),
-				footer: new NodeList(null, 1),
+				header: new ChildList(null, 1),
+				sections: new ChildList(null),
+				layers: new ChildList(null),
+				footer: new ChildList(null, 1),
 			},
 		});
+		this.required = true;
 	}
 }
 // BodyNode.name = 'body';

@@ -59,44 +59,37 @@
 		</div>
 
 		<style>
-			/*.list-group {
-				min-height: 100px;
-			}*/
 			#nodes .list-group {
-				/*position: relative;*/
-				border: 1px solid lightgrey;
-				/*padding: 22px;*/
+				/*border: 1px solid lightgrey;*/
 				padding-top: 22px;
+				padding-bottom: 22px;
 				border-radius: 4px;
-				/*margin: 22px 0px;*/
 				margin-bottom: 2px;
 				min-height: 46px;
 			}
 			#nodes .list-group-item {
 				padding: 0px;
-				margin: 0 22px;
+				margin-right: 22px;
+				margin-left: 22px;
 			}
-			/*#nodes .node-label { overflow: auto; }*/
 			#nodes .node-label > div {
 				display: inline-box;
 				float: left;
-				/*position: relative;
-				top: 0;
-				right: 0;*/
 				background-color: black;
 				color: white;
 				border-radius: 4px;
 				padding: 0px 4px;
 			}
-			/*#nodes .child-label { overflow: auto; }*/
 			#nodes .child-label > div {
 				display: inline-box;
 				float: right;
-				/*margin: 2px;*/
 				background-color: blue;
 				color: white;
 				border-radius: 4px;
 				padding: 0px 4px;
+			}
+			#nodes .sortable > li > ul {
+				border: 1px solid black;
 			}
 			.sortable-ghost {
 				background-color: lightblue;
@@ -105,7 +98,8 @@
 
 		<script>
 			/* TODO:
-
+				- logic for rearranging nodes
+				- multi-level find()
 			 */
 
 			var props = {
@@ -116,21 +110,16 @@
 				select : new PropType.Select('hello', ['hello', 'world']),
 			};
 
+			// initialize Jsonette structure
+
+			Jsonette.initialize();
 
 			var toolbox, nodes;
 			$(function() {
 
 				// render layout
 
-				// var $layout = $("#root");
-				// $layout.append(new JasonItem().render());
-				// // $layout.append(new BodyHeadItem().render())
-				// $layout.append(new Dropzone().render())
-
-
-
 				$('#toolbox').empty();
-				// _.each(NodeTypes, nodeType => $('#toolbox').append('<li class="list-group-item">'+nodeType.name()+'</li>').data('nodeType', nodeType));
 				_.each(NodeTypes, nodeType => {
 					var node = $('<li>')
 						.addClass('list-group-item')
@@ -138,8 +127,6 @@
 						.data('nodeType', nodeType);
 					$('#toolbox').append(node);
 				});
-
-
 
 				toolbox = new Sortable($('#toolbox').get(0), {
 					group: {
@@ -149,7 +136,6 @@
 					},
 					animation: 150,
 					sort: false,
-					// draggable: '.list-group-item',
 
 					onClone: function (/**Event*/evt) {
 						var origEl = evt.item;
@@ -158,34 +144,43 @@
 					},
 				});
 
+				$('#nodes').empty().append(Jsonette.$json.render());
 
 				var options = {
 					group: 'shared',
 					animation: 150,
-					// fallbackOnBody: true,
-					// draggable: '.list-group-item',
 
 					// Element is dropped into the list from another list
+					// same properties as onEnd
 					onAdd: function (/**Event*/evt) {
-						// same properties as onEnd
-						console.log('onAdd', evt);
-						console.log($(evt.item).data());
 
-						var nodeType = $(evt.item).data().nodeType;
-						var newNode = new nodeType();
-						console.log(newNode.render());
+						var toolboxNodeType = $(evt.item).data().nodeType;
+						var newNode = new toolboxNodeType();
 
-						// $(evt.item).replaceWith( $('<div class="list-group-item">NEW DISPLAY</div>') );
-						// var newGroup = $('<div class="list-group-item"><div class="list-group"><div class="list-group-item">NEW DISPLAY 1</div><div class="list-group-item">NEW DISPLAY 2</div></div></div>');
-						var newGroup = $(newNode.render());
-						$(evt.item).replaceWith(newGroup);
-						// Sortable.create($('.list-group', newGroup).get(0), options);
-						Sortable.create(newGroup.closest('.list-group').get(0), options);
+						// nodelist it was dropped to
+						var parentID = $(evt.to).data().id;
+						var parentProp = $(evt.to).data().property;
+
+						var $cloneNode = $(newNode.render());
+
+						console.log(['onAdd', evt, parentID, parentProp]);
+						try {
+							Jsonette.add(newNode, parentID, parentProp);
+						}
+						catch (e) {
+							// cancel add
+							$(evt.item).remove();
+							alert(e);
+							return;
+						}
+
+						$(evt.item).replaceWith($cloneNode);
+						Sortable.create($cloneNode.find('.list-group.sortable').get(0), options);
 					},
 				};
 
 				// nodes = new Sortable($('#nodes').get(0), options);
-				var nestedSortables = [].slice.call(document.querySelectorAll('#nodes .list-group'));
+				var nestedSortables = [].slice.call(document.querySelectorAll('#nodes .list-group.sortable'));
 				for (var i = 0; i < nestedSortables.length; i++) {
 					new Sortable(nestedSortables[i], options);
 				}
