@@ -72,9 +72,7 @@ var PropType = {
 			super();
 
 			this.$input = $("<select/>")
-				.append(
-					_.map(options, option => $("<option/>").text(option).val(option))
-				)
+				.append(_.map(options, option => $("<option/>").text(option).val(option)))
 				.val(initial || '')
 				.change(e => this.changeHandler())
 			;
@@ -83,26 +81,6 @@ var PropType = {
 		get value() {
 			return $("option:selected", this.$input).val();
 		}
-	},
-	// Node: class extends PropTypeBase {
-	// 	constructor() {
-
-	// 	}
-	// },
-	// Nodes: class extends PropTypeBase {
-	// 	constructor() {
-
-	// 	}
-	// },
-};
-
-
-var Util = {
-	uuid: function() {
-		// return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-		return 'x'+([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-		);
 	},
 };
 
@@ -125,7 +103,26 @@ var Jsonette = {
 		var childList = parentNode.nodes[parentProp];
 		childList.add(newNode);
 	},
-}
+	export: function() {
+		return Jsonette.$json.export();
+	},
+	alert: function(message) {
+		var $alert = $("#alert-template")
+			.clone()
+			.attr("id", "")
+			.find("#alert-message")
+			.html(message)
+			.end()
+			.appendTo("#alert")
+		;
+		setTimeout(() => $alert.remove(), 3000);
+	},
+	uuid: function() {
+		return 'x'+([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+		);
+	},
+};
 
 
 class Node {
@@ -134,7 +131,7 @@ class Node {
 	constructor(struct) {
 		this.props = struct.props || {};
 		this.nodes = struct.nodes || {};
-		this.id = Util.uuid();
+		this.id = Jsonette.uuid();
 		this.required = false;
 	}
 
@@ -142,6 +139,7 @@ class Node {
 		return (
 			_(this.nodes)
 			.map(childList => childList.find(nodeID))
+			.flatten()
 			.compact()
 			.first()
 		);
@@ -167,8 +165,15 @@ class Node {
 		`;
 	}
 
-	toJson() {
-		//
+	export() {
+		// var root = {};
+		// var self = root[this.constructor.name()] = {};
+		var self = {};
+		// _.extend(self, )
+		_.each(this.props, (prop, key) => _.extend(self, { [key]: prop }));
+		_.each(this.nodes, (childList, key) => _.extend(self, { [key]: childList.export() }));
+		// return root;
+		return self;
 	}
 }
 
@@ -190,12 +195,19 @@ class ChildList {
 	}
 
 	find(nodeID) {
-		return _.find(this.list, node => node.id == nodeID);
 		// return _.find(this.list, node => node.id == nodeID);
+		return _.find(this.list, node => node.id == nodeID) || _.map(this.list, node => node.find(nodeID));
 	}
 
 	render() {
 		return _.map(this.list, (item, i) => item.render()).join('');
+	}
+
+	export() {
+		if (this.max == 1)
+			return this.list.length ? this.list[0].export() : {};
+		else
+			return _.map(this.list, node => node.export());
 	}
 }
 
@@ -212,7 +224,6 @@ class JsonNode extends Node {
 		this.required = true;
 	}
 }
-// JsonNode.name = '$json';
 
 class HeadNode extends Node {
 	static name() { return 'head'; }
@@ -227,7 +238,6 @@ class HeadNode extends Node {
 		this.required = true;
 	}
 }
-// HeadNode.name = 'head';
 
 class BodyNode extends Node {
 	static name() { return 'body'; }
@@ -244,7 +254,6 @@ class BodyNode extends Node {
 		this.required = true;
 	}
 }
-// BodyNode.name = 'body';
 
 var NodeTypes = {
 	$json: JsonNode,
