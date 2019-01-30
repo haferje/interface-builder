@@ -164,34 +164,38 @@
 					},
 				});
 
-				$('#nodes').empty().append(Jsonette.$json.render());
+				$('#nodes').empty().append(Jsonette.render());
 
 				var options = {
-					group: 'shared',
+					group: {
+						name: 'shared',
+						put: function (to, from, clone, evt) {
+							try {
+								var cloneType = $(clone).data().nodeType;
+								var nodeID = $(to.el).data().id;
+								var childProp = $(to.el).data().property;
+
+								var childList = Jsonette.find(nodeID).child(childProp);
+								return (childList.accepts(cloneType) && childList.vacancy());
+							}
+							catch(e) {
+								return false;
+							}
+						},
+					},
 					animation: 150,
 
 					// Element is dropped into the list from another list
 					// same properties as onEnd
 					onAdd: function (/**Event*/evt) {
-
-						var toolboxNodeType = $(evt.item).data().nodeType;
-						var newNode = new toolboxNodeType();
-
-						// nodelist it was dropped to
+						var nodeType = $(evt.item).data().nodeType;
 						var parentID = $(evt.to).data().id;
 						var parentProp = $(evt.to).data().property;
 
-						var $cloneNode = $(newNode.render());
+						var $cloneNode = Jsonette.add(nodeType, parentID, parentProp);
 
-						console.log(['onAdd', evt, parentID, parentProp]);
-						try {
-							Jsonette.add(newNode, parentID, parentProp);
-						}
-						catch (e) {
-							// cancel add
+						if (!$cloneNode) {
 							$(evt.item).remove();
-							Jsonette.alert(e);
-							console.log(e);
 							return;
 						}
 

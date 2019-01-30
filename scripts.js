@@ -86,25 +86,58 @@ var PropType = {
 
 
 var Jsonette = {
-	$json: null,
+	root: null,
 	initialize: function() {
-		Jsonette.$json = new JsonNode();
-		Jsonette.$json.nodes.head = new ChildList(HeadNode, 1);
-		Jsonette.$json.nodes.body = new ChildList(BodyNode, 1);
-		Jsonette.$json.nodes.head.add(new HeadNode());
-		Jsonette.$json.nodes.body.add(new BodyNode());
+		this.root = new JsonNode();
+		this.root.nodes.head = new ChildList(HeadNode, 1);
+		this.root.nodes.body = new ChildList(BodyNode, 1);
+		this.root.nodes.head.add(new HeadNode());
+		this.root.nodes.body.add(new BodyNode());
 	},
-	add: function(newNode, parentID, parentProp) {
-		var parentNode = Jsonette.$json.find(parentID);
-
-		if (!parentNode)
-			throw "Couldn't find parent.";
-
-		var childList = parentNode.nodes[parentProp];
-		childList.add(newNode);
+	find: function(nodeID) {
+		return this.root.find(nodeID);
+	},
+	render: function() {
+		return this.root.render();
 	},
 	export: function() {
-		return Jsonette.$json.export();
+		return this.root.export();
+	},
+	add: function (nodeType, parentID, parentProp) {
+		var standardMessage = "There was an error when adding the item.";
+
+		var parentNode = this.find(parentID);
+		if (!parentNode) {
+			this.alert(standardMessage);
+			return false;
+		}
+
+		var childList = parentNode.child(parentProp);
+		if (!childList) {
+			this.alert(standardMessage);
+			return false;
+		}
+
+		if (!childList.accepts(nodeType)) {
+			this.alert("Parent element does not accept the dropped element type.");
+			return false;
+		}
+
+		if (!childList.vacancy()) {
+			this.alert("Cannot add item. Max items reached.");
+			return false;
+		}
+
+		var newNode = new nodeType();
+
+		if (!childList.add(newNode)) {
+			this.alert(standardMessage);
+			return false;
+		}
+
+		var $cloneNode = $(newNode.render());
+
+		return $cloneNode;
 	},
 	alert: function(message) {
 		var $alert = $("#alert-template")
@@ -145,6 +178,10 @@ class Node {
 		);
 	}
 
+	child(childName) {
+		return _.find(this.nodes, (childList, key) => key == childName);
+	}
+
 	render() {
 		return `
 			<li class="list-group-item" data-id="${this.id}">
@@ -166,13 +203,9 @@ class Node {
 	}
 
 	export() {
-		// var root = {};
-		// var self = root[this.constructor.name()] = {};
 		var self = {};
-		// _.extend(self, )
 		_.each(this.props, (prop, key) => _.extend(self, { [key]: prop }));
 		_.each(this.nodes, (childList, key) => _.extend(self, { [key]: childList.export() }));
-		// return root;
 		return self;
 	}
 }
@@ -185,22 +218,28 @@ class ChildList {
 	}
 
 	add(node) {
-		if (this.max && this.max <= this.list.length)
-			throw "Max items allowed.";
-		// if (!_.contains(this.types, typeof node))
-		if (!_.find(this.types, nodeType => node instanceof nodeType))
-			throw "Item type not allowed.";
+		if (this.accepts(node.constructor) && this.vacancy()) {
+			this.list.push(node);
+			return true;
+		}
 
-		this.list.push(node);
+		return false;
 	}
 
 	find(nodeID) {
-		// return _.find(this.list, node => node.id == nodeID);
 		return _.find(this.list, node => node.id == nodeID) || _.map(this.list, node => node.find(nodeID));
 	}
 
 	render() {
 		return _.map(this.list, (item, i) => item.render()).join('');
+	}
+
+	accepts(nodeType) {
+		return _.find(this.types, type => type == nodeType) || false;
+	}
+
+	vacancy() {
+		return (this.max && this.max > this.list.length);
 	}
 
 	export() {
