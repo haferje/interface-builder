@@ -139,6 +139,10 @@ var Jsonette = {
 
 		return $cloneNode;
 	},
+	properties: function(nodeID) {
+		var node = this.find(nodeID);
+		return node.properties();
+	},
 	alert: function(message) {
 		var $alert = $("#alert-template")
 			.clone()
@@ -180,6 +184,10 @@ class Node {
 
 	child(childName) {
 		return _.find(this.nodes, (childList, key) => key == childName);
+	}
+
+	properties() {
+		return this.props;
 	}
 
 	render() {
@@ -268,7 +276,12 @@ class HeadNode extends Node {
 	static name() { return 'head'; }
 	constructor() {
 		super({
-			props: {},
+			props: {
+				title: new PropType.String(),
+				description: new PropType.String(),
+				icon: new PropType.String(),
+				offline: new PropType.Bool(),
+			},
 			nodes: {
 				// TEST
 				head: new ChildList(HeadNode, 1),

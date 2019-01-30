@@ -201,6 +201,11 @@
 
 						$(evt.item).replaceWith($cloneNode);
 						Sortable.create($cloneNode.find('.list-group.sortable').get(0), options);
+
+						$cloneNode.click(() => {
+							var props = Jsonette.properties($(this.el).data().id);
+							renderProperties(props);
+						});
 					},
 				};
 
@@ -213,22 +218,27 @@
 
 				var $properties = $("#properties");
 				propChangeHandler = () => console.log('changed');
+				renderProperties(props);
 
-				_.each(props, (prop, name) => {
-					prop.changed(propChangeHandler);
+				function renderProperties(props) {
+					$properties.find("tbody").empty();
 
-					$properties
-						.find("tbody")
-						.append(
-							$("<tr/>")
-								.append(
-									$("<td/>")
-										.append(name),
-									$("<td/>")
-										.append(prop.render()),
-								)
-						)
-				});
+					_.each(props, (prop, name) => {
+						prop.changed(propChangeHandler);
+
+						$properties
+							.find("tbody")
+							.append(
+								$("<tr/>")
+									.append(
+										$("<td/>")
+											.append(name),
+										$("<td/>")
+											.append(prop.render()),
+									)
+							)
+					});
+				}
 
 				// properties JSON
 
