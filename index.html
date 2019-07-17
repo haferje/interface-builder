@@ -119,7 +119,8 @@
 				# toast messages for max items/disallowed drops
 				- logic for rearranging nodes
 				- loading/saving node properties
-				- visuals for droppable places
+				- visuals for all droppable places
+				- ability to remove nodes (trash bin ??)
 			 */
 
 			var props = {
@@ -156,12 +157,6 @@
 					},
 					animation: 150,
 					sort: false,
-
-					onClone: function (/**Event*/evt) {
-						var origEl = evt.item;
-						var cloneEl = evt.clone;
-						console.log(['clone', origEl, cloneEl, evt]);
-					},
 				});
 
 				$('#nodes').empty().append(Jsonette.render());
@@ -207,6 +202,26 @@
 							renderProperties(props);
 						});
 					},
+
+					onEnd: function (/**Event*/evt) {
+						var itemEl = evt.item;  // dragged HTMLElement
+						evt.to;    // target list
+						evt.from;  // previous list
+						evt.oldIndex;  // element's old index within old parent
+						evt.newIndex;  // element's new index within new parent
+						console.log(['end', evt.oldIndex, evt.newIndex]);
+					},
+
+					// onChange: function(/**Event*/evt) {
+					// 	// evt.newIndex // most likely why this event is used is to get the dragging element's current index
+					// 	// same properties as onEnd
+					// 	// var itemEl = evt.item;  // dragged HTMLElement
+					// 	// evt.to;    // target list
+					// 	// evt.from;  // previous list
+					// 	// evt.oldIndex;  // element's old index within old parent
+					// 	// evt.newIndex;  // element's new index within new parent
+					// 	console.log(['change', evt.oldIndex, evt.newIndex]);
+					// },
 				};
 
 				var nestedSortables = [].slice.call(document.querySelectorAll('#nodes .list-group.sortable'));
@@ -230,19 +245,16 @@
 							.find("tbody")
 							.append(
 								$("<tr/>")
+									.addClass('form-group')
 									.append(
 										$("<td/>")
-											.append(name),
+											.append(`<label for="${name}">${name}</label>`),
 										$("<td/>")
-											.append(prop.render()),
+											.append(prop.render().attr('id', name)),
 									)
 							)
 					});
 				}
-
-				// properties JSON
-
-				console.log(_.map(props, (prop, name) => ({ [name]: prop.value })));
 
 			});
 		</script>

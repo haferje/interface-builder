@@ -32,6 +32,8 @@ var PropType = {
 	String: class extends PropTypeBase {
 		constructor(initial) {
 			super(initial);
+
+			this.$input.addClass('form-control');
 		}
 	},
 	Bool: class extends PropTypeBase {
@@ -42,12 +44,17 @@ var PropType = {
 				.val(initial)
 				.change(e => this.changeHandler())
 		}
+
+		get value() {
+			return this.$input.is(':checked');
+		}
 	},
 	Int: class extends PropTypeBase {
 		constructor(initial) {
 			super(initial);
 
 			this.$input = $(`<input type="number">`)
+				.addClass('form-control')
 				.val(initial)
 				.change(e => this.changeHandler())
 		}
@@ -61,6 +68,7 @@ var PropType = {
 			super(initial);
 
 			this.$input = $(`<input type="color">`)
+				.addClass('form-control')
 				.val(initial)
 				.change(e => this.changeHandler())
 		}
@@ -72,6 +80,7 @@ var PropType = {
 			super();
 
 			this.$input = $("<select/>")
+				.addClass('form-control')
 				.append(_.map(options, option => $("<option/>").text(option).val(option)))
 				.val(initial || '')
 				.change(e => this.changeHandler())
@@ -212,7 +221,7 @@ class Node {
 
 	export() {
 		var self = {};
-		_.each(this.props, (prop, key) => _.extend(self, { [key]: prop }));
+		_.each(this.props, (prop, key) => _.extend(self, { [key]: prop.value }));
 		_.each(this.nodes, (childList, key) => _.extend(self, { [key]: childList.export() }));
 		return self;
 	}
@@ -284,7 +293,7 @@ class HeadNode extends Node {
 			},
 			nodes: {
 				// TEST
-				head: new ChildList(HeadNode, 1),
+				head: new ChildList(HeadNode, 2),
 			},
 		});
 		this.required = true;
